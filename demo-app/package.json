@@ -1,0 +1,17 @@
+{
+  "name": "signal-to-action-demo-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Demo workload that generates the signals the decision layer reads",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@prometheus-io/client": "^0.16.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "typescript": "^5.6.0"
+  }
+}

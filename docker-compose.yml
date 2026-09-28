@@ -1,0 +1,107 @@
+# Signal to Action lab.
+#
+# The prototype assumes a customer already runs Prometheus and Grafana. The
+# point of this file is to stand that stack up next to one small advisory
+# service, not to replace anything.
+name: signal-to-action
+
+services:
+  demo-app:
+    build: ./demo-app
+    ports:
+      # Host 3002 rather than 3000: on macOS the AirPlay receiver often holds 3000.
+      - "${DEMO_APP_PORT:-3002}:3000"
+    environment:
+      PORT: "3000"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --path.rootfs=/rootfs
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)
+
+  prometheus:
+    image: prom/prometheus:v2.53.2
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus/rules:/etc/prometheus/rules:ro
+    depends_on:
+      demo-app:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:9090/-/ready"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # Advisory only. Nothing else in the stack depends on this service, and it
+  # reads from the customer's Prometheus instead of storing anything itself.
+  evaluator:
+    build: ./evaluator
+    ports:
+      - "${EVALUATOR_PORT:-8081}:8080"
+    environment:
+      PORT: "8080"
+      PROMETHEUS_URL: http://prometheus:9090
+      DECISION_ENGINE: ${DECISION_ENGINE:-rules}
+      # Only used when DECISION_ENGINE is jev or compare. Interpolated from the
+      # host environment or a .env file, never hard-coded here.
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_JEV_MODEL: ${OPENROUTER_JEV_MODEL:-typesafe/jev-1.13}
+      JEV_MIN_CONFIDENCE: ${JEV_MIN_CONFIDENCE:-0.65}
+      JEV_TIMEOUT_MS: ${JEV_TIMEOUT_MS:-10000}
+    depends_on:
+      prometheus:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8080/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s

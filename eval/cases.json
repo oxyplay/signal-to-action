@@ -1,0 +1,448 @@
+[
+  {
+    "name": "healthy",
+    "category": "healthy",
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "Original fixture, unchanged. All signals comfortably normal.",
+    "observation": { "cpuUtilization": 0.18, "p95LatencyMs": 45, "errorRate": 0, "requestRate": 16.5, "previousRequestRate": 16.1, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "healthy-low-traffic",
+    "category": "healthy",
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "Idle service. Low absolute volume is not itself a problem.",
+    "observation": { "cpuUtilization": 0.12, "p95LatencyMs": 35, "errorRate": 0, "requestRate": 0.8, "previousRequestRate": 0.75, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "healthy-traffic-up",
+    "category": "healthy",
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "Traffic up roughly 8 percent. Service absorbs it; nothing degraded.",
+    "observation": { "cpuUtilization": 0.58, "p95LatencyMs": 210, "errorRate": 0.001, "requestRate": 52, "previousRequestRate": 48, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "healthy-high-cpu-idle",
+    "category": "healthy",
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "CPU at 76 percent but almost no traffic and no latency or error cost. Nothing user-visible.",
+    "observation": { "cpuUtilization": 0.76, "p95LatencyMs": 60, "errorRate": 0, "requestRate": 3, "previousRequestRate": 3.1, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "healthy-after-spike",
+    "category": "healthy",
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "Traffic has just fallen back from a spike. No lasting effect on the service.",
+    "observation": { "cpuUtilization": 0.44, "p95LatencyMs": 180, "errorRate": 0, "requestRate": 9, "previousRequestRate": 30, "observationWindowSeconds": 60 }
+  },
+
+  {
+    "name": "workload-pressure",
+    "category": "workload-pressure",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Original fixture, unchanged. Also produced by scenarios/workload-pressure.sh.",
+    "observation": { "cpuUtilization": 0.84, "p95LatencyMs": 120, "errorRate": 0, "requestRate": 57, "previousRequestRate": 19.4, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "workload-pressure-heavy-traffic",
+    "category": "workload-pressure",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Saturation with a large traffic increase. Latency and errors stay healthy.",
+    "observation": { "cpuUtilization": 0.91, "p95LatencyMs": 480, "errorRate": 0.002, "requestRate": 140, "previousRequestRate": 42, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "workload-pressure-mild-latency",
+    "category": "workload-pressure",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Latency elevated to 1.5s but traffic tripled and no request fails. A human would watch, not page.",
+    "observation": { "cpuUtilization": 0.79, "p95LatencyMs": 1500, "errorRate": 0.008, "requestRate": 88, "previousRequestRate": 30, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "workload-pressure-short-burst",
+    "category": "workload-pressure",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Very large instantaneous burst, 40x the previous window, with a fast service underneath.",
+    "observation": { "cpuUtilization": 0.83, "p95LatencyMs": 300, "errorRate": 0, "requestRate": 200, "previousRequestRate": 5, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "workload-pressure-saturated-flat-traffic",
+    "category": "workload-pressure",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Judgment call. CPU at 95 percent while traffic is flat, so traffic does not explain it, but there is no user-visible failure at all. Labelled pressure rather than degradation because nothing is degraded.",
+    "observation": { "cpuUtilization": 0.95, "p95LatencyMs": 900, "errorRate": 0.01, "requestRate": 300, "previousRequestRate": 280, "observationWindowSeconds": 60 }
+  },
+
+  {
+    "name": "application-degradation",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Original fixture, unchanged. Also produced by scenarios/application-degradation.sh.",
+    "observation": { "cpuUtilization": 0.84, "p95LatencyMs": 4499, "errorRate": 0.13, "requestRate": 13.9, "previousRequestRate": 16, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "latency-only-degradation",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Original fixture, unchanged. 2.6s p95 with unremarkable CPU and almost no errors. One signal says something is wrong and nothing corroborates it.",
+    "observation": { "cpuUtilization": 0.44, "p95LatencyMs": 2600, "errorRate": 0.004, "requestRate": 21, "previousRequestRate": 20.4, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "error-heavy-degradation",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Original fixture, unchanged. Requests fail fast so latency still looks healthy, but 27 percent of users are being rejected.",
+    "observation": { "cpuUtilization": 0.37, "p95LatencyMs": 310, "errorRate": 0.27, "requestRate": 34, "previousRequestRate": 33.1, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "degradation-errors-only",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Faster failure than error-heavy-degradation but still 19 percent of requests failing.",
+    "observation": { "cpuUtilization": 0.41, "p95LatencyMs": 240, "errorRate": 0.19, "requestRate": 29, "previousRequestRate": 28.6, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "degradation-latency-errors",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Both user-facing signals bad, CPU moderate. The clearest degradation case in the set.",
+    "observation": { "cpuUtilization": 0.52, "p95LatencyMs": 3100, "errorRate": 0.14, "requestRate": 18, "previousRequestRate": 18.5, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "degradation-cpu-latency",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "High CPU and slow responses but no failing requests. Users are waiting 2.4s, which is degradation on its own.",
+    "observation": { "cpuUtilization": 0.87, "p95LatencyMs": 2400, "errorRate": 0.02, "requestRate": 15, "previousRequestRate": 15.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "degradation-cpu-errors",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "High CPU and a fifth of requests failing, but latency is fine. Mirrors the error-heavy shape under resource pressure.",
+    "observation": { "cpuUtilization": 0.86, "p95LatencyMs": 400, "errorRate": 0.18, "requestRate": 12, "previousRequestRate": 12.4, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "degradation-elevated-traffic",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Degradation during a traffic increase. Traffic rising does not make 22 percent errors and a 5.2s p95 acceptable, so this is still degradation.",
+    "observation": { "cpuUtilization": 0.88, "p95LatencyMs": 5200, "errorRate": 0.22, "requestRate": 95, "previousRequestRate": 38, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "degradation-just-over-two-seconds",
+    "category": "application-degradation",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Judgment call. 2050ms p95 with zero errors and flat traffic. Sits directly on the two-second line that the rules engine also uses, which makes it a useful boundary check.",
+    "observation": { "cpuUtilization": 0.3, "p95LatencyMs": 2050, "errorRate": 0, "requestRate": 40, "previousRequestRate": 41, "observationWindowSeconds": 60 }
+  },
+
+  {
+    "name": "ambiguous-pressure",
+    "category": "ambiguous",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Original fixture, unchanged. CPU climbing, latency creeping, a small share of requests failing, traffic up some. Every signal is individually defensible and collectively unclear.",
+    "observation": { "cpuUtilization": 0.71, "p95LatencyMs": 1150, "errorRate": 0.021, "requestRate": 41, "previousRequestRate": 26, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "ambiguous-high-cpu-mild-latency",
+    "category": "ambiguous",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Judgment call. CPU above the rules threshold with flat traffic, so traffic does not explain it, but latency and errors are fine. Watching is the honest answer.",
+    "observation": { "cpuUtilization": 0.82, "p95LatencyMs": 900, "errorRate": 0.01, "requestRate": 30, "previousRequestRate": 30.5, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "ambiguous-moderate-everything",
+    "category": "ambiguous",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Judgment call. Nothing crosses a line and nothing is clean. The state a real on-call shift spends the most time in.",
+    "observation": { "cpuUtilization": 0.65, "p95LatencyMs": 1400, "errorRate": 0.035, "requestRate": 33, "previousRequestRate": 22, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "ambiguous-latency-up-flat-traffic",
+    "category": "ambiguous",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Judgment call, and a deliberately debatable one. 1.6s p95 is poor user experience but nothing is failing and traffic did not move. A reasonable engineer could argue INVESTIGATE.",
+    "observation": { "cpuUtilization": 0.55, "p95LatencyMs": 1600, "errorRate": 0.012, "requestRate": 28, "previousRequestRate": 28.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "ambiguous-error-creep",
+    "category": "ambiguous",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Judgment call. 4.5 percent failures is close to alarming but under the rules threshold. A trend rather than an event.",
+    "observation": { "cpuUtilization": 0.58, "p95LatencyMs": 700, "errorRate": 0.045, "requestRate": 44, "previousRequestRate": 40, "observationWindowSeconds": 60 }
+  },
+
+  {
+    "name": "missing-latency",
+    "category": "missing-data",
+    "expectedOperationalState": "insufficient_evidence",
+    "expectedDecision": "OBSERVE",
+    "note": "Original fixture, unchanged. High CPU with no latency data at all. Half the evidence is simply absent.",
+    "observation": { "cpuUtilization": 0.88, "p95LatencyMs": null, "errorRate": 0.01, "requestRate": 12, "previousRequestRate": 12.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "missing-error-rate",
+    "category": "missing-data",
+    "expectedOperationalState": "insufficient_evidence",
+    "expectedDecision": "OBSERVE",
+    "note": "Judgment call. Latency is high but without the error rate there is no way to know whether this is a slow service or a broken one. The honest label is not knowing.",
+    "observation": { "cpuUtilization": 0.83, "p95LatencyMs": 2900, "errorRate": null, "requestRate": 20, "previousRequestRate": 20.3, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "missing-traffic",
+    "category": "missing-data",
+    "expectedOperationalState": "insufficient_evidence",
+    "expectedDecision": "OBSERVE",
+    "note": "Both traffic fields absent, so load cannot be compared with anything.",
+    "observation": { "cpuUtilization": 0.79, "p95LatencyMs": 500, "errorRate": 0.006, "requestRate": null, "previousRequestRate": null, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "missing-cpu",
+    "category": "missing-data",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Deliberately not insufficient_evidence. Latency and errors are both clearly bad, and CPU is not needed to know users are being hurt. Used to check whether the model reaches for insufficient_evidence too eagerly.",
+    "observation": { "cpuUtilization": null, "p95LatencyMs": 2600, "errorRate": 0.15, "requestRate": 15, "previousRequestRate": 15.1, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "missing-cpu-and-latency",
+    "category": "missing-data",
+    "expectedOperationalState": "insufficient_evidence",
+    "expectedDecision": "OBSERVE",
+    "note": "Only the error rate survives, and 16 percent failures on their own is not enough to tell an incident from a bad deploy.",
+    "observation": { "cpuUtilization": null, "p95LatencyMs": null, "errorRate": 0.16, "requestRate": 19, "previousRequestRate": 19.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "missing-errors-and-traffic",
+    "category": "missing-data",
+    "expectedOperationalState": "insufficient_evidence",
+    "expectedDecision": "OBSERVE",
+    "note": "One signal left, and it is high. Structurally similar to latency-only-degradation but with the error rate also unknown.",
+    "observation": { "cpuUtilization": 0.91, "p95LatencyMs": 4100, "errorRate": null, "requestRate": null, "previousRequestRate": null, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "mostly-missing",
+    "category": "missing-data",
+    "expectedOperationalState": "insufficient_evidence",
+    "expectedDecision": "OBSERVE",
+    "note": "Original fixture, unchanged. Almost nothing is known. Any confident classification here would be invented.",
+    "observation": { "cpuUtilization": null, "p95LatencyMs": null, "errorRate": null, "requestRate": null, "previousRequestRate": null, "observationWindowSeconds": 60 }
+  },
+
+  {
+    "name": "contradictory-high-cpu-low-traffic",
+    "category": "contradictory",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "CPU at 93 percent on under one request per second. Something outside request handling is consuming the host, but no user is affected.",
+    "observation": { "cpuUtilization": 0.93, "p95LatencyMs": 300, "errorRate": 0, "requestRate": 0.9, "previousRequestRate": 0.85, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "contradictory-low-cpu-high-latency",
+    "category": "contradictory",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "CPU at 14 percent with a 5.2 second p95 points at a blocked dependency or I/O rather than compute, but users are waiting and that is what matters.",
+    "observation": { "cpuUtilization": 0.14, "p95LatencyMs": 5200, "errorRate": 0.002, "requestRate": 7, "previousRequestRate": 7.1, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "contradictory-errors-low-volume",
+    "category": "contradictory",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Judgment call. A third of requests fail but fewer than one per second arrives, so the aggregate looks small. The users who do arrive are being rejected.",
+    "observation": { "cpuUtilization": 0.66, "p95LatencyMs": 1200, "errorRate": 0.34, "requestRate": 0.6, "previousRequestRate": 0.58, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "contradictory-traffic-spike-no-errors",
+    "category": "contradictory",
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "A 50x traffic spike with latency up to 1.1s and nothing failing. The service is absorbing it.",
+    "observation": { "cpuUtilization": 0.75, "p95LatencyMs": 1100, "errorRate": 0, "requestRate": 400, "previousRequestRate": 8, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "contradictory-high-cpu-high-latency-no-errors",
+    "category": "contradictory",
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Judgment call. High CPU and a 2.9 second p95 with essentially zero errors. A latency-only reading would call this healthy on the error signal alone.",
+    "observation": { "cpuUtilization": 0.88, "p95LatencyMs": 2900, "errorRate": 0.001, "requestRate": 22, "previousRequestRate": 22.3, "observationWindowSeconds": 60 }
+  },
+
+  {
+    "name": "boundary-latency-0700",
+    "category": "boundary",
+    "family": "latency",
+    "familyOrder": 1,
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "Latency sweep, all other signals fixed and healthy. Labels for the 1100-1600ms band are a human judgment call and are the debatable part of this family.",
+    "observation": { "cpuUtilization": 0.42, "p95LatencyMs": 700, "errorRate": 0.003, "requestRate": 30, "previousRequestRate": 30.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-latency-0900",
+    "category": "boundary",
+    "family": "latency",
+    "familyOrder": 2,
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "Latency sweep. Still clearly inside normal for a service whose baseline is around 50ms.",
+    "observation": { "cpuUtilization": 0.42, "p95LatencyMs": 900, "errorRate": 0.003, "requestRate": 30, "previousRequestRate": 30.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-latency-1100",
+    "category": "boundary",
+    "family": "latency",
+    "familyOrder": 3,
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Latency sweep. First step where users would notice a change. Debatable boundary: the rules engine still calls this normal.",
+    "observation": { "cpuUtilization": 0.42, "p95LatencyMs": 1100, "errorRate": 0.003, "requestRate": 30, "previousRequestRate": 30.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-latency-1300",
+    "category": "boundary",
+    "family": "latency",
+    "familyOrder": 4,
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Latency sweep. Watch rather than act. Debatable boundary.",
+    "observation": { "cpuUtilization": 0.42, "p95LatencyMs": 1300, "errorRate": 0.003, "requestRate": 30, "previousRequestRate": 30.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-latency-1600",
+    "category": "boundary",
+    "family": "latency",
+    "familyOrder": 5,
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Latency sweep. Upper end of the debatable band. The rules engine still calls this normal.",
+    "observation": { "cpuUtilization": 0.42, "p95LatencyMs": 1600, "errorRate": 0.003, "requestRate": 30, "previousRequestRate": 30.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-latency-2000",
+    "category": "boundary",
+    "family": "latency",
+    "familyOrder": 6,
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Latency sweep. Two seconds is where a human stops waiting and starts looking. Sits exactly on the rules threshold.",
+    "observation": { "cpuUtilization": 0.42, "p95LatencyMs": 2000, "errorRate": 0.003, "requestRate": 30, "previousRequestRate": 30.2, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-latency-2600",
+    "category": "boundary",
+    "family": "latency",
+    "familyOrder": 7,
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Latency sweep. Unambiguously past the point where a request is merely slow.",
+    "observation": { "cpuUtilization": 0.42, "p95LatencyMs": 2600, "errorRate": 0.003, "requestRate": 30, "previousRequestRate": 30.2, "observationWindowSeconds": 60 }
+  },
+
+  {
+    "name": "boundary-error-0000",
+    "category": "boundary",
+    "family": "error",
+    "familyOrder": 1,
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "Error sweep, all other signals fixed and healthy. The 1 and 3 percent labels are a human judgment call.",
+    "observation": { "cpuUtilization": 0.48, "p95LatencyMs": 180, "errorRate": 0, "requestRate": 26, "previousRequestRate": 26.1, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-error-0100",
+    "category": "boundary",
+    "family": "error",
+    "familyOrder": 2,
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Error sweep. One percent of requests failing deserves attention. Debatable boundary: the rules engine calls this normal.",
+    "observation": { "cpuUtilization": 0.48, "p95LatencyMs": 180, "errorRate": 0.01, "requestRate": 26, "previousRequestRate": 26.1, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-error-0600",
+    "category": "boundary",
+    "family": "error",
+    "familyOrder": 3,
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Error sweep. Past the point where failing requests are an incident rather than a blip.",
+    "observation": { "cpuUtilization": 0.48, "p95LatencyMs": 180, "errorRate": 0.06, "requestRate": 26, "previousRequestRate": 26.1, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-error-1500",
+    "category": "boundary",
+    "family": "error",
+    "familyOrder": 4,
+    "expectedOperationalState": "application_degradation",
+    "expectedDecision": "INVESTIGATE",
+    "note": "Error sweep. Unambiguous.",
+    "observation": { "cpuUtilization": 0.48, "p95LatencyMs": 180, "errorRate": 0.15, "requestRate": 26, "previousRequestRate": 26.1, "observationWindowSeconds": 60 }
+  },
+
+  {
+    "name": "boundary-traffic-100",
+    "category": "boundary",
+    "family": "traffic",
+    "familyOrder": 1,
+    "expectedOperationalState": "healthy",
+    "expectedDecision": "HEALTHY",
+    "note": "Traffic sweep, all other signals fixed. requestRate varies, previousRequestRate is held at 20 so the ratio is 1.0.",
+    "observation": { "cpuUtilization": 0.52, "p95LatencyMs": 240, "errorRate": 0.002, "requestRate": 20, "previousRequestRate": 20, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-traffic-160",
+    "category": "boundary",
+    "family": "traffic",
+    "familyOrder": 2,
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Traffic sweep. 1.6x the previous window, service coping. Just past the rules ratio.",
+    "observation": { "cpuUtilization": 0.52, "p95LatencyMs": 240, "errorRate": 0.002, "requestRate": 32, "previousRequestRate": 20, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-traffic-300",
+    "category": "boundary",
+    "family": "traffic",
+    "familyOrder": 3,
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Traffic sweep. 3x the previous window, still nothing degraded.",
+    "observation": { "cpuUtilization": 0.52, "p95LatencyMs": 240, "errorRate": 0.002, "requestRate": 60, "previousRequestRate": 20, "observationWindowSeconds": 60 }
+  },
+  {
+    "name": "boundary-traffic-800",
+    "category": "boundary",
+    "family": "traffic",
+    "familyOrder": 4,
+    "expectedOperationalState": "workload_pressure",
+    "expectedDecision": "OBSERVE",
+    "note": "Traffic sweep. 8x the previous window. The service absorbs it, which is the whole point of a workload-pressure label.",
+    "observation": { "cpuUtilization": 0.52, "p95LatencyMs": 240, "errorRate": 0.002, "requestRate": 160, "previousRequestRate": 20, "observationWindowSeconds": 60 }
+  }
+]
