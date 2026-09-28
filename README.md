@@ -251,11 +251,11 @@ A full run makes 510 paid OpenRouter calls costing roughly $0.012, and Jev is a 
 
 ## Article
 
-This repository accompanies:
+This repository accompanies the article:
 
-**Evaluating Jev for Prometheus Alert Triage: 51 Scenarios, 510 API Calls**
+[Evaluating Jev for Prometheus Alert Triage](https://www.linkedin.com/pulse/evaluating-jev-prometheus-alert-triage-maksym-nevinchanyy-l71te)
 
-The article URL is not available yet. This placeholder will be replaced with the published link.
+It reports on 51 scenarios and 510 API calls. Every figure it cites is reproducible from the committed benchmark artifacts in this repository, and the [generated report](eval/results/jev-1.13-20260928-163359.md) contains the underlying numbers in full.
 
 ## License
 
